@@ -25,6 +25,35 @@ class User extends Authenticatable
      * @var array
      */
     protected $hidden = [
-        'password', 'remember_token',
+        'password', 'remember_token'
     ];
+
+    protected $primaryKey = 'unique_id';
+
+
+    public function books(){
+        return $this->hasMany(Book::class);
+    }
+
+    public function authors(){
+        return $this->hasMany(Author::class);
+    }
+
+    public function setUniqueIdAttribute($date){
+
+        $unique_id = str_random(6).'-'.$date.'-'.str_random(6);
+
+        return $this->attributes['unique_id'] = $unique_id;
+    }
+
+    public function getUniqueIdAttribute($value){
+        return $value;
+    }
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasManyThrough
+     * Rating, Books
+     */
+    public function ratings(){
+        return $this->hasManyThrough(Rating::class,Book::class);
+    }
 }
