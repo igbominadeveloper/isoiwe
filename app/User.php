@@ -45,7 +45,7 @@ class User extends Authenticatable
         return $this->attributes['unique_id'] = $unique_id;
     }
 
-    public function getUniqueIdAttribute(){
+    public static function getUniqueIdAttribute(){
         return $this->setUniqueIdAttribute();
     }
 
