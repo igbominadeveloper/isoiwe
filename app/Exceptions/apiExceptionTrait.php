@@ -18,21 +18,21 @@ trait apiExceptionTrait
         }
         return parent::render($this->request, $this->exception);
     }
-    public function isModel(){
+    protected function isModel(){
         return $this->modelResponse();
     }
 
-    public function isHttp(){
+    protected function isHttp(){
         return $this->httpResponse();
     }
 
-    public function modelResponse(){
+    protected function modelResponse(){
         return response()->json([
             'errors' => 'Model Not Found'
         ], Response::HTTP_NOT_FOUND);
     }
 
-    public function httpResponse(){
+    protected function httpResponse(){
         return response()->json([
             'errors' => 'Incorrect route'
         ], Response::HTTP_NOT_FOUND);
