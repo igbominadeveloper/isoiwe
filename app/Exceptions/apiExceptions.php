@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
-trait apiExceptionTrait
+trait apiExceptions
 {
     public function apiException($request, $exception){
         if ($exception instanceof NotFoundHttpException){
