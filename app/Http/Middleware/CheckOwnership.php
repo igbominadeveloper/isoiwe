@@ -16,11 +16,9 @@ class BlockRequest
      */
     public function handle($request, Closure $next)
     {
-        if(! $request->user() || $request->user() == null){
-            return response()->json([
-                'errors' => 'Unauthorized Request'
-            ], Response::HTTP_FORBIDDEN);
-        }
+        $requestUser = $request->user()->id;
+        $resourceOwner = $request->getRouteResolver();
+
         return $next($request);
     }
 }

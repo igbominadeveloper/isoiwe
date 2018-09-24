@@ -7,6 +7,7 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Laravel\Passport\HasApiTokens;
+use Symfony\Component\HttpFoundation\Response;
 
 class User extends Authenticatable
 {
@@ -57,20 +58,25 @@ class User extends Authenticatable
 
     public function addBookToLibrary($book){
         $this->books()->save($book);
-        return response($book,201);
+        return response()->json([
+            'message' => $book
+        ], Response::HTTP_OK);
     }
 
     public function updatesBook($data, $book){
 
         $book->update($data);
 
-        return response($book,201);
+        return response()->json([
+            'message' => $book
+        ], Response::HTTP_OK);
     }
 
     public function ratesABook($book, $rating){
-        if($book->ratings()->attach([$rating->id => ['user_id' => auth()->id()]]))
-            return true;
-        return false;
+
+        $user = request()->user()->id;
+
+        $book->ratings()->attach($rating, ['user_id' => $user]);
     }
 
     public function deletesABook($book){

@@ -24,12 +24,12 @@ class BooksResource extends JsonResource
 
         return [
           'title' => $this->title,
+            'author' => $this->author->full_name,
           'description' => $this->description,
           'rating' => [
             'star' => $count > 0 ? round($score/$count,0) : 'No Rating Yet',
               'href' => route('ratings.index',$this->id)
-          ],
-            'author' => $this->author->full_name
+          ]
         ];
     }
 }

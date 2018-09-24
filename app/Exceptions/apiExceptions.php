@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Illuminate\Validation\ValidationException;
+use App\Exceptions\NotResourceOwnerException;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Database\QueryException;
 
@@ -32,6 +33,10 @@ trait apiExceptions
             return $this->isQuery($exception);
         }
 
+        elseif ($exception instanceof NotResourceOwnerException){
+            return $this->isNotResourceOwner($exception);
+        }
+
         return parent::render($this->request, $this->exception);
     }
     protected function isModel(){
@@ -52,6 +57,10 @@ trait apiExceptions
 
     protected function isAuthentication($exception){
         return $this->authenticationResponse($exception);
+    }
+
+    protected function isNotResourceOwner($exception){
+        return $this->ownershipResponse($exception);
     }
 
     protected function modelResponse(){
@@ -85,5 +94,9 @@ trait apiExceptions
             [
                'errors' => $exception->getErrors()
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
+    }
+
+    protected function ownershipResponse($exception){
+        return response()->json($exception->getErrorMessage(),Response::HTTP_FORBIDDEN);
     }
 }

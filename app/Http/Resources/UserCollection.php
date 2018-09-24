@@ -17,6 +17,7 @@ class UserCollection extends Resource
         return [
             'name' => $this->name,
             'email' => $this->email,
+            'id' => $this->id,
         ];
     }
 }

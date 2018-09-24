@@ -4,11 +4,13 @@ namespace App\Http\Controllers;
 
 use App\Book;
 use App\BookRating;
+use App\Exceptions\NotResourceOwnerException;
 use App\Http\Requests\CreateBookForm;
 use App\Http\Resources\BooksResource;
 use App\Http\Resources\BookCollection;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use League\Flysystem\Exception;
 
 class BookController extends Controller
 {
@@ -86,35 +88,43 @@ class BookController extends Controller
      */
     public function update(Request $request, Book $book)
     {
-        $this->validate($request,[
-           'title' => 'unique:books'
-        ]);
+        if ($this->ownerCheck($book ,$request))
+            $this->validate($request,[
+               'title' => 'unique:books'
+            ]);
 
-        if($request->user()->updatesBook($request->all(),$book)){
-            return response([
-                'data' => new BooksResource($book)
-            ], 200);
-        }
-        else{
-            return response([
-                'error' => 'Update Failed'
-            ], 500)->json();
-        }
+            if($request->user()->updatesBook($request->all(),$book)){
+                return response([
+                    'data' => new BooksResource($book)
+                ], 200);
+            }
+            else{
+                return response([
+                    'error' => 'Update Failed'
+                ], 500)->json();
+            }
     }
 
     /**
      * Remove the specified resource from storage.
      *
      * @param  \App\Book  $book
+     * @param  \Illuminate\Http\Request $request
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Book $book)
+    public function destroy(Book $book,Request $request)
     {
-        if(request()->user()->deletesAbook($book))
-            return response([
-                'message' => 'Book Deleted'
-            ], 200);
-        else
-            return response("error", 500);
+        if ($this->ownerCheck($book,$request))
+            if(request()->user()->deletesAbook($book))
+                return response([
+                    'message' => 'Book Deleted'
+                ], 200);
+            else
+                return response("error", 500);
+    }
+
+    public function ownerCheck($book, $request){
+        if ($book->user_id !== $request->user()->id)
+            throw new NotResourceOwnerException;
     }
 }
