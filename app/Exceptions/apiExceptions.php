@@ -7,6 +7,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Auth\AuthenticationException;
+use Illuminate\Database\QueryException;
 
 trait apiExceptions
 {
@@ -27,10 +28,18 @@ trait apiExceptions
             return $this->isAuthentication($exception);
         }
 
+        elseif ($exception instanceof QueryException){
+            return $this->isQuery($exception);
+        }
+
         return parent::render($this->request, $this->exception);
     }
     protected function isModel(){
         return $this->modelResponse();
+    }
+
+    protected function isQuery($exception){
+        return $this->queryResponse($exception);
     }
 
     protected function isHttp(){
@@ -67,7 +76,14 @@ trait apiExceptions
     protected function authenticationResponse($exception){
         return response()->json(
             [
-               'errors' => $exception->message()
+               'errors' => $exception->errors()
             ], Response::HTTP_UNAUTHORIZED);
+    }
+
+    protected function queryResponse($exception){
+        return response()->json(
+            [
+               'errors' => $exception->getErrors()
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
     }
 }

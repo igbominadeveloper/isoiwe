@@ -30,6 +30,7 @@ class User extends Authenticatable
         'password', 'remember_token',
     ];
 
+    protected $uniqueId;
     /**
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      * Books created by a user
@@ -42,16 +43,17 @@ class User extends Authenticatable
         return $this->hasMany(Author::class);
     }
 
-    public function setUniqueIdAttribute(){
-
-        $unique_id = str_random(6).'-'.date('Y-m-d').'-'.str_random(6);
-
-        return $this->attributes['unique_id'] = $unique_id;
-    }
+//    public function setUniqueIdAttribute(){
+//
+//        $unique_id = str_random(6).'-'.date('Y-m-d').'-'.str_random(6);
+//
+//        return $this->attributes['unique_id'] = $this->uniqueId = $unique_id;
+//    }
 
     public static function getUniqueIdAttribute(){
-        return static::setUniqueIdAttribute();
+        return $unique_id = str_random(6).'-'.date('Y-m-d').'-'.str_random(6);
     }
+
 
     public function addBookToLibrary($book){
         $this->books()->save($book);
@@ -66,8 +68,9 @@ class User extends Authenticatable
     }
 
     public function ratesABook($book, $rating){
-        $book->ratings()->attach([$rating->id => ['user_id' => auth()->id()]]);
-        return true;
+        if($book->ratings()->attach([$rating->id => ['user_id' => auth()->id()]]))
+            return true;
+        return false;
     }
 
     public function deletesABook($book){

@@ -48,7 +48,10 @@ class RatingController extends Controller
          $rating = Rating::find($rating_id);
 
         if(auth()->user()->ratesABook($book, $rating))
-            return response(new BooksResource($book));
+//            return response(new BooksResource($book));
+            return response()->json([
+                'message' => 'Rating successful'
+            ], Response::HTTP_CREATED);
         else
             return response()->json([
                 'error' => 'Book rating failed'
