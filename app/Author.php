@@ -6,10 +6,13 @@ use Illuminate\Database\Eloquent\Model;
 
 class Author extends Model
 {
-    protected $primaryKey = 'unique_id';
 
     protected $fillable = [
         'full_name','email'
+    ];
+
+    protected $hidden = [
+        'created_at', 'updated_at', 'unique_id'
     ];
 
     public function books(){

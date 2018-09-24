@@ -14,10 +14,22 @@ class BooksResource extends JsonResource
      */
     public function toArray($request)
     {
+        $ratings = $this->ratings;
+
+        $count = count($ratings);
+        $score = 0;
+        foreach ($ratings as $rating) {
+            $score += $rating->id;
+        }
+
         return [
           'title' => $this->title,
           'description' => $this->description,
-          'unique_id' => $this->author_id,
+          'rating' => [
+            'star' => $count > 0 ? round($score/$count,0) : 'No Rating Yet',
+              'href' => route('ratings.index',$this->id)
+          ],
+            'author' => $this->author->full_name
         ];
     }
 }

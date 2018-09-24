@@ -4,20 +4,25 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * @property mixed ratings
+ */
 class Book extends Model
 {
     protected $fillable = [
-        'title','author','description','published_at'
+        'title','author_id','description','published_at','unique_id',
     ];
 
     protected $dates = [
         'published_at'
     ];
 
-    protected $primaryKey = 'unique_id';
+    protected $hidden = [
+      'created_at','updated_at','rating_id','user_id','unique_id'
+    ];
 
-    public function rating(){
-        return $this->hasOne(Rating::class);
+    public function ratings(){
+        return $this->belongsToMany(Rating::class);
     }
 
     public function setUniqueIdAttribute($date){
@@ -29,13 +34,8 @@ class Book extends Model
         return $unique_id = $value;
     }
 
-    public function setRatingAttribute(){
-//        $current_rating = $this->rating()->rating;
-//
-//        $new_rating = $current_rating
+    public function author(){
+        return $this->belongsTo(Author::class);
     }
 
-    public function author(){
-        return $this->hasOne(Author::class);
-    }
 }

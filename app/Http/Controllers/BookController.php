@@ -3,47 +3,64 @@
 namespace App\Http\Controllers;
 
 use App\Book;
+use App\BookRating;
+use App\Http\Requests\CreateBookForm;
 use App\Http\Resources\BooksResource;
+use App\Http\Resources\BookCollection;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class BookController extends Controller
 {
-    public function __construct()
-    {
-        $this->middleware('auth')->except('index');
-    }
 
     /**
+     * BookController constructor.
+     * @param $user
+     * @param $middleware
+     */
+    public function __construct()
+    {
+        $this->middleware('auth:api')->except('index','show');
+    }
+
+
+
+    /*
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
     public function index()
     {
-        return BooksResource::collection(Book::all());
+        return BookCollection::collection(Book::paginate(10));
     }
 
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  \Illuminate\Http\Request $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(CreateBookForm $request)
     {
-        $this->validate($request, [
-            'title' => 'required|unique',
-            'description' => 'required',
-            'user_id' => 'required',
-            'author_id' => 'required'
-        ]);
 
-       $newBook = Book::create($request->all());
+        $new_book = new Book();
 
-       if($newBook){
-           return response(200)->toJson($newBook);
+        $new_book->title = $request->title;
+        $new_book->description = $request->description;
+        $new_book->author_id = $request->author_id;
+        $new_book->published_at = $request->published_at;
+
+        $new_book->unique_id = $request->user()->getUniqueIdAttribute();
+
+
+        if($request->user()->addBookToLibrary($new_book)){
+           return response([
+               'data' => new BooksResource($new_book)
+           ], 201);
        }
-       return ['error' => 'Book Creation Failed'];
+
+       return response()->json(['error' => 'Book Creation Failed'],500);
 
     }
 
@@ -55,7 +72,7 @@ class BookController extends Controller
      */
     public function show(Book $book)
     {
-        return $book;
+        return new BooksResource($book);
     }
 
 
@@ -69,11 +86,19 @@ class BookController extends Controller
      */
     public function update(Request $request, Book $book)
     {
-        if ($book->update($request->all())){
-            return response(200)->toJson(['message' => 'Data Updated','book' => $book]);
+        $this->validate($request,[
+           'title' => 'unique:books'
+        ]);
+
+        if($request->user()->updatesBook($request->all(),$book)){
+            return response([
+                'data' => new BooksResource($book)
+            ], 200);
         }
         else{
-            return ['error' => 'Update Failed'];
+            return response([
+                'error' => 'Update Failed'
+            ], 500)->json();
         }
     }
 
@@ -85,11 +110,11 @@ class BookController extends Controller
      */
     public function destroy(Book $book)
     {
-        if($book->delete()){
-            return response()->toJson(['message' => 'Book Deleted']);
-        }
-        else{
-            return response(500);
-        }
+        if(request()->user()->deletesAbook($book))
+            return response([
+                'message' => 'Book Deleted'
+            ], 200);
+        else
+            return response("error", 500);
     }
 }
