@@ -30,6 +30,10 @@ class User extends Authenticatable
         'password', 'remember_token',
     ];
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     * Books created by a user
+     */
     public function books(){
         return $this->hasMany(Book::class);
     }
@@ -46,7 +50,7 @@ class User extends Authenticatable
     }
 
     public static function getUniqueIdAttribute(){
-        return $this->setUniqueIdAttribute();
+        return static::setUniqueIdAttribute();
     }
 
     public function addBookToLibrary($book){

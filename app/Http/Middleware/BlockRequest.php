@@ -3,6 +3,7 @@
 namespace App\Http\Middleware;
 
 use Closure;
+use Symfony\Component\HttpFoundation\Response;
 
 class BlockRequest
 {
@@ -16,7 +17,9 @@ class BlockRequest
     public function handle($request, Closure $next)
     {
         if(! $request->user() || $request->user() == null){
-            return response("Unauthenticated",403);
+            return response()->json([
+                'errors' => 'Unauthorized Request'
+            ], Response::HTTP_FORBIDDEN);
         }
         return $next($request);
     }

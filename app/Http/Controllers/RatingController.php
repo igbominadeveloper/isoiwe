@@ -7,8 +7,8 @@ use App\Http\Resources\BooksResource;
 use App\Http\Resources\RatingResource;
 use App\Rating;
 use App\Book;
-use App\User;
 use Illuminate\Http\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 class RatingController extends Controller
 {
@@ -37,10 +37,9 @@ class RatingController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(Request $request, Book $book)
     {
         $this->validate($request, [
-            'book_id' => 'required | integer',
             'rating_id' => 'required | integer'
         ]);
 
@@ -48,16 +47,12 @@ class RatingController extends Controller
 
          $rating = Rating::find($rating_id);
 
-        if (!empty($request)) {
-            $book = Book::findOrFail($request->book_id);
-        }
-
         if(auth()->user()->ratesABook($book, $rating))
             return response(new BooksResource($book));
         else
             return response()->json([
                 'error' => 'Book rating failed'
-            ], 500);
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
 
     }
 

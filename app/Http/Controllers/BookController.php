@@ -51,7 +51,7 @@ class BookController extends Controller
         $new_book->author_id = $request->author_id;
         $new_book->published_at = $request->published_at;
 
-        $new_book->unique_id = $request->user()->getUniqueIdAttribute();
+        $new_book->unique_id = $new_book->getUniqueIdAttribute();
 
 
         if($request->user()->addBookToLibrary($new_book)){

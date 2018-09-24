@@ -25,13 +25,13 @@ class Book extends Model
         return $this->belongsToMany(Rating::class);
     }
 
-    public function setUniqueIdAttribute($date){
-        $unique_id = str_random(6).'-'.$date.'-'.str_random(6);
+    public function setUniqueIdAttribute(){
+        $unique_id = str_random(6).'-'.date('Y-m-d').'-'.str_random(6);
         return $this->attributes['unique_id'] = $unique_id;
     }
 
-    public function getUniqueIdAttribute($value){
-        return $unique_id = $value;
+    public function getUniqueIdAttribute(){
+        return $this->setUniqueIdAttribute();
     }
 
     public function author(){
