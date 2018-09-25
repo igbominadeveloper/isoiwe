@@ -15,11 +15,9 @@ class RatingResource extends JsonResource
     public function toArray($request)
     {
         return [
-          'star' => $this->id,
-            'comment' => $this->grade,
-            'user' => $this->whenPivotLoaded('book_rating', function(){
-                return new UserCollection(User::find($this->pivot->user_id));
-            })
+          'star' => $this->star,
+            'comment' => $this->comment,
+            'user' => $this->user->name
         ];
     }
 }

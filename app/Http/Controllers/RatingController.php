@@ -28,7 +28,7 @@ class RatingController extends Controller
 
     public function index(Book $book)
     {
-        return RatingResource::collection($book->ratings()->withPivot('user_id')->get());
+        return RatingResource::collection($book->ratings->load('user'));
     }
 
     /**
@@ -40,14 +40,11 @@ class RatingController extends Controller
     public function store(Request $request, Book $book)
     {
         $this->validate($request, [
-            'rating_id' => 'required | integer'
+            'star' => 'required | integer',
+            'comment' => 'required | string'
         ]);
 
-         $rating_id = $request->rating_id;
-
-         $rating = Rating::find($rating_id);
-
-        if(! $request->user()->ratesABook($book, $rating)) {
+        if($request->user()->ratesABook($book, $request)) {
             return response()->json([
                 'response' => "Book Rating successful"
             ], Response::HTTP_CREATED);

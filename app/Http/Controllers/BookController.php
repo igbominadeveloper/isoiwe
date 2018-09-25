@@ -9,8 +9,6 @@ use App\Http\Requests\CreateBookForm;
 use App\Http\Resources\BooksResource;
 use App\Http\Resources\BookCollection;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use League\Flysystem\Exception;
 
 class BookController extends Controller
 {
@@ -40,7 +38,7 @@ class BookController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request $request
+     * @param  \App\Http\Requests\CreateBookForm $request
      * @return \Illuminate\Http\Response
      */
     public function store(CreateBookForm $request)
@@ -126,5 +124,6 @@ class BookController extends Controller
     public function ownerCheck($book, $request){
         if ($book->user_id !== $request->user()->id)
             throw new NotResourceOwnerException;
+        return true;
     }
 }

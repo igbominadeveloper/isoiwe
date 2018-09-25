@@ -28,10 +28,9 @@ class User extends Authenticatable
      * @var array
      */
     protected $hidden = [
-        'password', 'remember_token',
+        'password', 'remember_token','created_at','updated_at','email_verified_at','unique_id'
     ];
 
-    protected $uniqueId;
     /**
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      * Books created by a user
@@ -44,17 +43,9 @@ class User extends Authenticatable
         return $this->hasMany(Author::class);
     }
 
-//    public function setUniqueIdAttribute(){
-//
-//        $unique_id = str_random(6).'-'.date('Y-m-d').'-'.str_random(6);
-//
-//        return $this->attributes['unique_id'] = $this->uniqueId = $unique_id;
-//    }
-
     public static function getUniqueIdAttribute(){
         return $unique_id = str_random(6).'-'.date('Y-m-d').'-'.str_random(6);
     }
-
 
     public function addBookToLibrary($book){
         $this->books()->save($book);
@@ -72,11 +63,16 @@ class User extends Authenticatable
         ], Response::HTTP_OK);
     }
 
-    public function ratesABook($book, $rating){
+    public function ratesABook($book, Request $request){
+        $rating = new Rating();
+        $rating->user_id = $request->user()->id;
+        $rating->book_id = $book;
+        $rating->comment = $request->comment;
+        $rating->star = $request->star;
 
-        $user = request()->user()->id;
-
-        $book->ratings()->attach($rating, ['user_id' => $user]);
+        if($book->ratings()->save($rating))
+            return true;
+        return false;
     }
 
     public function deletesABook($book){
@@ -92,6 +88,6 @@ class User extends Authenticatable
      * Rating, Books
      */
     public function ratings(){
-        return $this->books()->ratings();
+        return $this->hasMany(Rating::class);
     }
 }

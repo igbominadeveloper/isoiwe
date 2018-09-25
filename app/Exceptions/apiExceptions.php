@@ -65,7 +65,7 @@ trait apiExceptions
 
     protected function modelResponse(){
         return response()->json([
-            'errors' => 'Model Not Found'
+            'errors' => 'Resource Model Not Found'
         ], Response::HTTP_NOT_FOUND);
     }
 

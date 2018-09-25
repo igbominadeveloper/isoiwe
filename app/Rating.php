@@ -6,18 +6,18 @@ use Illuminate\Database\Eloquent\Model;
 
 class Rating extends Model
 {
+    protected $fillable = [
+        'star','comment'
+    ];
     protected $hidden = [
         'created_at', 'updated_at'
     ];
 
-    public function books(){
-        return $this->belongsToMany(Book::class);
+    public function book(){
+        return $this->belongsTo(Book::class);
     }
 
-    public function users(){
-        return $this->hasMany(User::class);
+    public function user(){
+        return $this->belongsTo(User::class);
     }
 }
-
-// select ratings of a book
-// load the users who gave the ratings

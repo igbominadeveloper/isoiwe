@@ -18,11 +18,11 @@ class Book extends Model
     ];
 
     protected $hidden = [
-      'created_at','updated_at','rating_id','user_id','unique_id'
+      'created_at','updated_at','user_id','unique_id'
     ];
 
     public function ratings(){
-        return $this->belongsToMany(Rating::class);
+        return $this->hasMany(Rating::class);
     }
 
     public function setUniqueIdAttribute(){
@@ -36,6 +36,10 @@ class Book extends Model
 
     public function author(){
         return $this->belongsTo(Author::class);
+    }
+
+    public function user(){
+        return $this->belongsTo(User::class);
     }
 
 }

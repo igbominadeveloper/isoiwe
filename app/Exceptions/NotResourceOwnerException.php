@@ -4,7 +4,7 @@ namespace App\Exceptions;
 
 use Exception;
 
-class sNotResourceOwnerException extends Exception
+class NotResourceOwnerException extends Exception
 {
     public function render(){
         return $this->getErrorMessage();
