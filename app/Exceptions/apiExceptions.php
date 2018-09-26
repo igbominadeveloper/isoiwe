@@ -37,7 +37,7 @@ trait apiExceptions
             return $this->isNotResourceOwner($exception);
         }
 
-        return parent::render($this->request, $this->exception);
+        return parent::render($request, $exception);
     }
     protected function isModel(){
         return $this->modelResponse();

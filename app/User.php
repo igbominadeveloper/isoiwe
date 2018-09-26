@@ -63,13 +63,7 @@ class User extends Authenticatable
         ], Response::HTTP_OK);
     }
 
-    public function ratesABook($book, Request $request){
-        $rating = new Rating();
-        $rating->user_id = $request->user()->id;
-        $rating->book_id = $book;
-        $rating->comment = $request->comment;
-        $rating->star = $request->star;
-
+    public function ratesABook($book, $rating){
         if($book->ratings()->save($rating))
             return true;
         return false;
